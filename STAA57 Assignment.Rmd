@@ -12,16 +12,22 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ```{r}
-d=read.csv("/Users/yshhhh/Desktop/STAA57.csv")
+# Read the CSV file located at the specified path into a data frame named 'd'
+d =read.csv ("/Users/mark/Desktop/course/staa57/R_CSV_DATA_ANALYZE/g0811_05.csv") 
+# Load the 'tidyverse' package, which includes a collection of R packages for data manipulation and visualization
 library(tidyverse)
+# Load the 'ggplot2' package, a popular R package for creating graphics and plots
 library(ggplot2)
+# Load the 'knitr' package, which provides tools for dynamic report generation in R
 library(knitr)
+# Load the 'rpart' package, which provides functions for recursive partitioning and regression trees
 library(rpart)
 ```
 
 
 ## 1.Description
 ```{r}
+# Display the column names of the data frame 'd'
 names(d)
 ```
 (describe variables)
@@ -38,17 +44,34 @@ https://data.ontario.ca/dataset/reason-for-part-time-work-by-immigration-status
 # 4.1 Total population of part-time job over Canada
 
 ```{r}
+# Create a new data frame 'd_table1' by filtering the data frame 'd' to select rows where:
+# - Reason is "Part-time employment, all reasons"
+# - Immig. is "Total"
+# - Age.group is "15+"
+# Then, select only the columns 'Year', 'Geography', 'Both.sexes', 'Men', and 'Women' from the filtered data frame.
+# Arrange the resulting data frame by the 'Geography' column.
 d_table1=d %>%
   filter(Reason=="Part-time employment, all reasons" &Immig.=="Total" &Age.group=="15+") %>% select(Year,Geography,Both.sexes,Men,Women) %>% arrange(Geography)
+# Display the data in 'd_table1' as a nicely formatted table using the 'kable' function
 kable(d_table1)
 ```
 
 # 4.2（test reason=	Caring for children 的比例 ，男女的ratio是否一样（4.3 table）） test ratio=0.5
 ```{r}
+# Filter the data frame 'd' to select rows where 'Geography' is "Canada"
 d_ratio= d %>% filter(Geography=="Canada") 
+
+# Further filter the 'd_ratio' data frame to select rows where:
+# - 'Reason' is "Caring for children"
+# - 'Age.group' is "15+"
+# - 'Immig.' is "Total"
+# Then, calculate the ratio of 'Men' to 'Both.sexes' and create a new column named 'ratio'.
+# Finally, select the 'Year' and 'ratio' columns.
 d_ratio=d_ratio %>%
   filter(Reason=="  Caring for children" & Age.group=="15+" & Immig.=="Total" ) %>% 
   mutate(ratio=Men/Both.sexes) %>% select(Year,ratio) 
+
+# Display the data in 'd_ratio' as a nicely formatted table using the 'kable' function
 kable(d_ratio)
 
 ```
@@ -57,18 +80,29 @@ kable(d_ratio)
 ## 5. Graphs
 # 5.1 Graph of population of par-time job men over years
 ```{r}
-ggplot()+geom_point(aes(x=Year,y=Men),data=d_table1)+
+# Create a ggplot object and add a line plot using the 'geom_line' function.
+# Map the 'Year' variable to the x-axis, 'Men' variable to the y-axis, and 'Geography' variable to the color aesthetic.
+# Use data from the 'd_table1' data frame.
+# Label the y-axis as "population of part-time job men"
+# Set the title of the plot as "Graph of population of par-time job men over years"
+ggplot()+geom_line(aes(x=Year,y=Men,col=Geography),data=d_table1)+
   ylab("population of part-time job men")+
   ggtitle("Graph of population of par-time job men over years")
+
 ```
 
 
-# 5.2 Graph of tatio (table 4.2的 呃呃改改这个标题)  over years 
+# 5.2 Graph of population of part-time job for women over year
 ```{r}
+# Create a ggplot object and add a scatter plot using the 'geom_point' function.
+# Map the 'Year' variable to the x-axis and the 'ratio' variable to the y-axis, using data from the 'd_ratio' data frame.
+# Label the y-axis as "population of part-time job for women"
+# Add a linear regression line to the plot using the 'geom_smooth' function
+# Set the title of the plot
 ggplot()+geom_point(aes(x=Year,y=ratio),data=d_ratio)+
   ylab("population of part-time job for women")+
   geom_smooth(method="lm")+  #why no line
-  ggtitle("??")
+  ggtitle("Graph of population of part-time job for women over years")
 ```
 
 
@@ -78,6 +112,10 @@ test reason=caring for children 的比例 ，男女的proportion是否一样（4
 H0: 男的比率是0.5 也就是男女比例都一样
 HA：more women ie ratio<0.5
 ```{r}
+# Perform a one-sample t-test on the 'ratio' variable from the 'd_ratio' data frame.
+# The null hypothesis (H0) is that the population mean of the 'ratio' variable is equal to 0.5.
+# The alternative hypothesis (H1) is that the population mean of the 'ratio' variable is less than 0.5.
+# Use a confidence level of 95%.
 t.test(d_ratio %>% select(ratio),alternative="less",mu=0.5,conf.level=0.95)
 ```
 reject  H0 more women 因为caring for children而选择parttime
@@ -85,22 +123,42 @@ reject  H0 more women 因为caring for children而选择parttime
 ## 7. Bootstrapping
 # 7.1 test parttime 增长率的CI for regression
 ```{r}
+# Define a bootstrapping function named 'boot_function'.
+# Within the function:
+# - Sample with replacement from the 'd_table1' data frame and store it in 'boot.d'.
+# - Fit a linear model ('lm') with 'Both.sexes' as the response variable and 'Year' as the predictor variable using the sampled data.
+# - Extract the slope coefficient ('s') from the fitted model.
+# - Return the slope coefficient.
 boot_function=function(){
-boot.d = d_table1 %>% sample_n(nrow(d_table1), replace=T)
-m2 = lm(Both.sexes~Year, data=boot.d)
-s = coef(m2)[2]
-return(s) }
+  boot.d = d_table1 %>% sample_n(nrow(d_table1), replace=T)
+  m2 = lm(Both.sexes~Year, data=boot.d)
+  s = coef(m2)[2]
+  return(s) 
+}
+# Perform bootstrapping by calling 'boot_function' 1000 times and store the output in 'output'.
 output = replicate(1000, boot_function()) 
+
+# Calculate the 2.5th and 97.5th percentiles of the 'output' vector.
 quantile(output, c(0.025,0.975))
+
 ```
 # 7.2 （重现6.2的CI） week6 
 ```{r}
+# Define a bootstrapping function named 'boot_function2'.
+# Within the function:
+# - Select the 'ratio' variable from the 'd_ratio' data frame and store it in 'obs.sample'.
+# - Sample with replacement from 'obs.sample' and store it in 'boot.d'.
+# - Calculate the mean of the sampled data and return it.
 boot_function2=function(){
-obs.sample=d_ratio %>% select(ratio)
-boot.d = sample_n(obs.sample,size=nrow(d_ratio), replace=T)
-return(mean(boot.d[,1])) 
+  obs.sample=d_ratio %>% select(ratio)
+  boot.d = sample_n(obs.sample,size=nrow(d_ratio), replace=T)
+  return(mean(boot.d[,1])) 
 }
+
+# Perform bootstrapping by calling 'boot_function2' 1000 times and store the output in 'output'.
 output = replicate(1000, boot_function2())
+
+# Calculate the 5th percentile of the 'output' vector.
 quantile(output,probs=c(0.05))
 
 ```
@@ -110,9 +168,11 @@ quantile(output,probs=c(0.05))
 ## 8 Regression analysis
 # 8.1 random forest
 ```{r}
+# Filter the data frame 'd' to exclude rows where 'Reason' is "Part-time employment, all reasons".
 d1=d %>% filter(Reason!="Part-time employment, all reasons")
-# reason=1 means try to find a full-time work in last month
-# reason=0 means not try to find a full-time work in last moth
+# Assign a binary value to the 'reason' variable based on 'Reason' values:
+# - 0 if the reason does not involve looking for full-time work in the last month
+# - 1 if the reason involves looking for full-time work in the last month
 d1=d1%>% mutate(reason=case_when(Reason=="  Own illness"~0,
                                Reason=="  Caring for children"~0,
                                Reason=="  Other personal or family responsibilities"~0,
@@ -123,20 +183,29 @@ d1=d1%>% mutate(reason=case_when(Reason=="  Own illness"~0,
                                Reason=="  Could not find full-time work, did not look for full-time work in last month"~0,
                                Reason=="  Business conditions, looked for full-time work in last month"~1,
                                Reason=="  Could not find full-time work, looked for full-time work in last month"~1))
+# Load the 'randomForest' package for building random forest models
 library(randomForest)
+# Build a random forest model ('rforest.m') to predict the 'reason' variable based on other variables.
 rforest.m = randomForest(reason ~ Year+Geography+Immig.+Age.group++Both.sexes+Men+Women,data=d1,ntree=500,importance=TRUE)
+# Visualize variable importance using the 'varImpPlot' function
 varImpPlot(rforest.m)
+# Make predictions using the random forest model on the same data ('d1') and calculate the mean squared error
 d_randomforest=d1%>%mutate(rforest_pred=predict(rforest.m,new_data=d1))
 mean((d_randomforest$reason-d_randomforest$rforest_pred)^2)
 ```
 
 # 8.2 Linear regression
 ```{r}
+# Fit a linear regression model ('m2') with 'Both.sexes' as the response variable and 'Year' as the predictor variable using data from 'd_table1'.
 m2=lm(Both.sexes~Year,data=d_table1)
+# Display a summary of the linear regression model
 summary(m2)
 ```
  (解释pvalue， intercept，slope)
  for d_table1, 0.9248 of the population can be explained by the linear regression model.
  
+
+# 9 Summary of Research
+Based on the information presented in the report, the following are the key findings:
 
 
