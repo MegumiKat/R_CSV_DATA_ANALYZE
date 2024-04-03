@@ -1,5 +1,5 @@
 ---
-title: "STAA57 Assignment"
+title: "STAA57 Assignment_newest"
 author: "Group"
 date: "2024-03-28"
 output:
@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ```{r}
 # Read the CSV file located at the specified path into a data frame named 'd'
-d =read.csv ("/Users/mark/Desktop/course/staa57/R_CSV_DATA_ANALYZE/g0811_05.csv") 
+d =read.csv ("/Users/yshhhh/Desktop/STAA57.csv") 
 # Load the 'tidyverse' package, which includes a collection of R packages for data manipulation and visualization
 library(tidyverse)
 # Load the 'ggplot2' package, a popular R package for creating graphics and plots
@@ -22,6 +22,7 @@ library(ggplot2)
 library(knitr)
 # Load the 'rpart' package, which provides functions for recursive partitioning and regression trees
 library(rpart)
+
 ```
 
 
@@ -29,34 +30,120 @@ library(rpart)
 ```{r}
 # Display the column names of the data frame 'd'
 names(d)
+
+glimpse(d)
 ```
 (describe variables)
+[1]: The year immigrants immigrated to the Geometry area
+[2]: The geographic area of the research, in which Ontario is
+     included in Canada
+[3]: The type of immigration.
+[4]: Reason for working the part-time job
+[5]: The age group of the immigrants working the part-time job
+[6]: The amount of of immigrants of both genders working the part-time job
+[7]: The amount of male immigrants working the part-time job
+[8]: The amount of female immigrants working the part-time job
 
 ## 2.The Background of the Data
 https://data.ontario.ca/dataset/reason-for-part-time-work-by-immigration-status
 
-## 3.What is the over all research question？
-1. Do more people work part-time as the years go by?
-2. Are there any significant differences in part-time population growth between Canada and Ontario
+The reasons for part-time-work by immigration- tatus data for 2020 was collected 
+by Statistics Canada, specifically by the Labour Force Survey Special 
+Tabulations. The data collected includes information on reason for part-time 
+work by immigration status, such as caring for children, going to school, 
+and could not find full-time work, looked for full-time work in last month, 
+and so on.This data can be reproduced and distributed on an "as is" basis with 
+the permission of Statistics Canada (Statistics Canada Open Licence Agreement).
 
+The dataset can be used for analysis and insights into the part-time job 
+employment patterns and trends of immigrants looking for part-time jobs in 
+Canada from 2006 to2016. 
+Beginning January 1997, all respondents who usually worked less 
+than 30 hours per week at their main or only job (part-time workers) are asked 
+if they want to work more or less than 30 hours at a (single) job or business. 
+Depending on the response, the main reason for working part-time is collected.
+For those who respond that they want to work part-time, the main reason for not 
+wanting to work full-time is collected. Responses include: own illness, personal 
+or family responsibilities, going to school, personal preference, or other. For 
+those who respond that they want to work full-time, the main reason for working 
+part-time is collected. Responses include: own illness, personal or family 
+responsibilities, going to school, business conditions, could not find work 
+with 30 or more hours, or other. Those whose response is business conditions or 
+could not find work with 30 or more hours are then asked if they looked for work 
+with 30 or more hours during the past four weeks. The involuntary part-time rate
+is calculated by dividing the number of persons whose response was business 
+conditions or could not find work with 30 or more hours by the total number of
+persons working part-time at their main or only job.
+
+Overall, the reason-for-part-time-work-by-immigration-status dataset is a 
+valuable resource for assessing the effectiveness of employment policies across
+immigration status, and inform labor market planning and policy decisions by 
+immigration status. 
+
+
+## 3.What is the over all research question？
+As researchers, our overall research question is to investigate the part-time
+job employment patterns and trends of immigrants looking for part-time jobs in 
+Canada from 2006 to2016. We aim to analyze various variables, such as age group,
+immigration status, gender(sex), reasons, year and geography, to gain insights 
+into the connection between immigration status and part-time work, 
+and to identify any patterns or trends that may emerge from the data. 
+Specifically, our research question is:
+
+1. Do more people work part-time as the years go by?
+2. Are there any significant differences in part-time population growth between 
+Canada and Ontario
+  更多深度的问题？
 
 ## 4. Tables
-# 4.1 Total population of part-time job over Canada
+# 4.1  The Top 5 Most Popular Reasons for immigration
+```{r}
+
+d_top5=d %>% 
+  filter(Reason!="Part-time employment, all reasons" &Immig.=="Total" 
+         &Age.group=="15+" &Geography=="Canada") %>% 
+          select(Year,Reason,Both.sexes) %>%  group_by(Reason) %>%
+          mutate(total_popu_over_years=sum(Both.sexes))
+d_top5=d_top5 %>% filter(Year=="2016") %>% 
+  select(Reason,total_popu_over_years) %>% arrange(desc(total_popu_over_years))
+# Display the data in 'd_top5' as a nicely formatted table using the 'kable' function
+kable(d_top5[1:5,])
+
+```
+This table shows the top 5 most popular reasons for immigrants to work 
+part-time in the given dataset. It lists the names of the stations under the 
+column “Reason” and the corresponding number of population over years from 2006 
+to 2016 under the column “total_popu_over_years”.
+
+The table is sorted in descending order based on the number of reasons of 
+finding a part-time, so the reason with the highest numberis listed first. 
+According to the table, the most popular starting station is “Going to school” 
+with 13826.8 thousands of times, followed by “Personal preference” with 12638.3 
+thousands of times, and “Business conditions, did not look for full-time work 
+in last month” with 5703.1 thousands of times.
+
+This table can be useful for immigrants or city officials to identify the most 
+popular reasons for finding a part-time in immigrant groups and plan their 
+careers and life accordingly, such as finding a part-time to accumulate funds 
+for academic qualification improvement.
+
+# 4.2 Total population of part-time job over Canada
 
 ```{r}
-# Create a new data frame 'd_table1' by filtering the data frame 'd' to select rows where:
+# Create a new data frame 'd_table1' by filtering the data frame 'd' to select 
+#rows where:
 # - Reason is "Part-time employment, all reasons"
 # - Immig. is "Total"
 # - Age.group is "15+"
-# Then, select only the columns 'Year', 'Geography', 'Both.sexes', 'Men', and 'Women' from the filtered data frame.
+# Then, select only the columns 'Year', 'Geography', 'Both.sexes', 'Men', and 
+#'Women' from the filtered data frame.
 # Arrange the resulting data frame by the 'Geography' column.
 d_table1=d %>%
   filter(Reason=="Part-time employment, all reasons" &Immig.=="Total" &Age.group=="15+") %>% select(Year,Geography,Both.sexes,Men,Women) %>% arrange(Geography)
-# Display the data in 'd_table1' as a nicely formatted table using the 'kable' function
 kable(d_table1)
 ```
 
-# 4.2（test reason=	Caring for children 的比例 ，男女的ratio是否一样（4.3 table）） test ratio=0.5
+# 4.3（test reason=	Caring for children 的比例 ，男女的ratio是否一样（4.3 table）） test ratio=0.5
 ```{r}
 # Filter the data frame 'd' to select rows where 'Geography' is "Canada"
 d_ratio= d %>% filter(Geography=="Canada") 
@@ -73,7 +160,6 @@ d_ratio=d_ratio %>%
 
 # Display the data in 'd_ratio' as a nicely formatted table using the 'kable' function
 kable(d_ratio)
-
 ```
 
 
@@ -88,42 +174,33 @@ kable(d_ratio)
 ggplot()+geom_line(aes(x=Year,y=Men,col=Geography),data=d_table1)+
   ylab("population of part-time job men")+
   ggtitle("Graph of population of par-time job men over years")
-
 ```
 
 
-# 5.2 Graph of population of part-time job for women over year
+# 5.2 Graph of tatio (table 4.2的 呃呃改改这个标题)  over years 
 ```{r}
-# Create a ggplot object and add a scatter plot using the 'geom_point' function.
-# Map the 'Year' variable to the x-axis and the 'ratio' variable to the y-axis, using data from the 'd_ratio' data frame.
-# Label the y-axis as "population of part-time job for women"
-# Add a linear regression line to the plot using the 'geom_smooth' function
-# Set the title of the plot
-ggplot()+geom_point(aes(x=Year,y=ratio),data=d_ratio)+
-  ylab("population of part-time job for women")+
+ggplot(aes(x=Year,y=ratio),data=d_ratio)+geom_point()+
+  ylab("ratio")+
   geom_smooth(method="lm")+  #why no line
-  ggtitle("Graph of population of part-time job for women over years")
+  ggtitle("title") #记得改
 ```
 
 
 
 ## 6. Confidence interval and test of hypothesis
 test reason=caring for children 的比例 ，男女的proportion是否一样（4.3 table）
-H0: 男的比率是0.5 也就是男女比例都一样
-HA：more women ie ratio<0.5
+ The null hypothesis (H0) is that the population mean of the 'ratio' variable is equal to 0.5.
+ The alternative hypothesis (H1) is that the population mean of the 'ratio' variable is less than 0.5.
 ```{r}
+
 # Perform a one-sample t-test on the 'ratio' variable from the 'd_ratio' data frame.
-# The null hypothesis (H0) is that the population mean of the 'ratio' variable is equal to 0.5.
-# The alternative hypothesis (H1) is that the population mean of the 'ratio' variable is less than 0.5.
 # Use a confidence level of 95%.
 t.test(d_ratio %>% select(ratio),alternative="less",mu=0.5,conf.level=0.95)
 ```
-reject  H0 more women 因为caring for children而选择parttime
+reject  H0  which means more women 因为caring for children而选择parttime
 
 ## 7. Bootstrapping
-
-# 7.1 Bootstrapping Analysis for Slope Coefficient Estimation in Linear Regression Model
-The code below is to perform bootstrapping to estimate the variability of the slope coefficient in a linear regression model where 'Both.sexes' is the response variable and 'Year' is the predictor variable. The code achieves this by repeatedly sampling with replacement from the dataset ('d_table1'), fitting linear models to the sampled data, extracting the slope coefficient from each model, and finally calculating the 2.5th and 97.5th percentiles of the slope coefficient estimates obtained from bootstrapping.
+# 7.1 test parttime 增长率的CI for regression
 ```{r}
 # Define a bootstrapping function named 'boot_function'.
 # Within the function:
@@ -152,10 +229,10 @@ quantile(output, c(0.025,0.975))
   
   In the meanwhile, the increasing values of 'Both.sexes' may reflect progress towards gender equality or a blurring of traditional gender roles over time. This trend could be indicative of greater acceptance and recognition of diverse gender identities and expressions in society.
   
-  By the way, this ouput may also contribute to raising public awareness about the evolving nature of gender identities and expressions. It underscores the importance of fostering inclusive environments and promoting acceptance and understanding of diverse gender experiences.
+  By the way, this output may also contribute to raising public awareness about the evolving nature of gender identities and expressions. It underscores the importance of fostering inclusive environments and promoting acceptance and understanding of diverse gender experiences.
+  
 
-# 7.2 Bootstrapping Analysis for Mean Estimation
-The code below is to conduct bootstrapping to estimate the mean of the 'ratio' variable in the 'd_ratio' dataset. The function 'boot_function2' is defined to repeatedly sample with replacement from the 'ratio' variable, calculate the mean of the sampled data, and return it. The code then performs bootstrapping by calling 'boot_function2' 1000 times and calculates the 5th percentile of the resulting output vector.
+# 7.2 （重现6.2的CI） week6 
 ```{r}
 # Define a bootstrapping function named 'boot_function2'.
 # Within the function:
@@ -175,17 +252,17 @@ output = replicate(1000, boot_function2())
 quantile(output,probs=c(0.05))
 
 ```
-**From the above consequence:**
+  **From the above consequence:**
 
     The output indicates that the 5th percentile of the bootstrapped means of the 'ratio' variable is approximately 0.045. This suggests that there is a 5% probability that the true mean of the 'ratio' variable in the population is lower than or equal to 0.045, based on the bootstrapped samples.
   
     Therefore, the conclusion is that the estimated mean of the 'ratio' variable in the dataset 'd_ratio' is likely to be greater than 0.045, with 95% confidence. This information can be valuable for understanding the central tendency of the 'ratio' variable and making inferences about the population mean based on the sampled data.
 
 
-
 ## 8 Regression analysis
 # 8.1 random forest
 ```{r}
+
 # Filter the data frame 'd' to exclude rows where 'Reason' is "Part-time employment, all reasons".
 d1=d %>% filter(Reason!="Part-time employment, all reasons")
 # Assign a binary value to the 'reason' variable based on 'Reason' values:
@@ -204,14 +281,14 @@ d1=d1%>% mutate(reason=case_when(Reason=="  Own illness"~0,
 # Load the 'randomForest' package for building random forest models
 library(randomForest)
 # Build a random forest model ('rforest.m') to predict the 'reason' variable based on other variables.
-rforest.m = randomForest(reason ~ Year+Geography+Immig.+Age.group++Both.sexes+Men+Women,data=d1,ntree=500,importance=TRUE)
+rforest.m = randomForest(as.factor(reason) ~ Year+Geography+Immig.+Age.group++Both.sexes+Men+Women,data=d1,ntree=500,importance=TRUE)
 # Visualize variable importance using the 'varImpPlot' function
 varImpPlot(rforest.m)
 # Make predictions using the random forest model on the same data ('d1') and calculate the mean squared error
 d_randomforest=d1%>%mutate(rforest_pred=predict(rforest.m,new_data=d1))
-
-mean((d_randomforest$reason-d_randomforest$rforest_pred)^2)
-
+matrix=table(d_randomforest$reason,d_randomforest$rforest_pred)
+matrix
+mean(sum(diag(matrix))/sum(matrix))
 ```
 
 # 8.2 Linear regression
@@ -221,14 +298,8 @@ m2=lm(Both.sexes~Year,data=d_table1)
 # Display a summary of the linear regression model
 summary(m2)
 ```
-Here are some explanations about the component:
-
-
  (解释pvalue， intercept，slope)
  for d_table1, 0.9248 of the population can be explained by the linear regression model.
  
-
 # 9 Summary of Research
-Based on the information presented in the report, the following are the key findings:
-
 
