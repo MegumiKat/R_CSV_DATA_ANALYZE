@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ```{r}
-d=read.csv("/Users/yshhhh/Desktop/STAA57.csv")
+d  =read.csv(file = "https://data.ontario.ca/dataset/5fa90c65-8624-4451-9dbe-8c410031611c/resource/86097d56-1812-42b5-81bb-15d9ff45285f/download/g0811_05.csv")
 library(tidyverse)
 library(ggplot2)
 library(knitr)
