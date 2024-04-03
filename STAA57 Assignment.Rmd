@@ -1,0 +1,142 @@
+---
+title: "STAA57 Assignment"
+author: "Group"
+date: "2024-03-28"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r}
+d=read.csv("/Users/yshhhh/Desktop/STAA57.csv")
+library(tidyverse)
+library(ggplot2)
+library(knitr)
+library(rpart)
+```
+
+
+## 1.Description
+```{r}
+names(d)
+```
+(describe variables)
+
+## 2.The Background of the Data
+https://data.ontario.ca/dataset/reason-for-part-time-work-by-immigration-status
+
+## 3.What is the over all research question？
+1. Do more people work part-time as the years go by?
+2. Are there any significant differences in part-time population growth between Canada and Ontario
+
+
+## 4. Tables
+# 4.1 Total population of part-time job over Canada
+
+```{r}
+d_table1=d %>%
+  filter(Reason=="Part-time employment, all reasons" &Immig.=="Total" &Age.group=="15+") %>% select(Year,Geography,Both.sexes,Men,Women) %>% arrange(Geography)
+kable(d_table1)
+```
+
+# 4.2（test reason=	Caring for children 的比例 ，男女的ratio是否一样（4.3 table）） test ratio=0.5
+```{r}
+d_ratio= d %>% filter(Geography=="Canada") 
+d_ratio=d_ratio %>%
+  filter(Reason=="  Caring for children" & Age.group=="15+" & Immig.=="Total" ) %>% 
+  mutate(ratio=Men/Both.sexes) %>% select(Year,ratio) 
+kable(d_ratio)
+
+```
+
+
+## 5. Graphs
+# 5.1 Graph of population of par-time job men over years
+```{r}
+ggplot()+geom_point(aes(x=Year,y=Men),data=d_table1)+
+  ylab("population of part-time job men")+
+  ggtitle("Graph of population of par-time job men over years")
+```
+
+
+# 5.2 Graph of tatio (table 4.2的 呃呃改改这个标题)  over years 
+```{r}
+ggplot()+geom_point(aes(x=Year,y=ratio),data=d_ratio)+
+  ylab("population of part-time job for women")+
+  geom_smooth(method="lm")+  #why no line
+  ggtitle("??")
+```
+
+
+
+## 6. Confidence interval and test of hypothesis
+test reason=caring for children 的比例 ，男女的proportion是否一样（4.3 table）
+H0: 男的比率是0.5 也就是男女比例都一样
+HA：more women ie ratio<0.5
+```{r}
+t.test(d_ratio %>% select(ratio),alternative="less",mu=0.5,conf.level=0.95)
+```
+reject  H0 more women 因为caring for children而选择parttime
+
+## 7. Bootstrapping
+# 7.1 test parttime 增长率的CI for regression
+```{r}
+boot_function=function(){
+boot.d = d_table1 %>% sample_n(nrow(d_table1), replace=T)
+m2 = lm(Both.sexes~Year, data=boot.d)
+s = coef(m2)[2]
+return(s) }
+output = replicate(1000, boot_function()) 
+quantile(output, c(0.025,0.975))
+```
+# 7.2 （重现6.2的CI） week6 
+```{r}
+boot_function2=function(){
+obs.sample=d_ratio %>% select(ratio)
+boot.d = sample_n(obs.sample,size=nrow(d_ratio), replace=T)
+return(mean(boot.d[,1])) 
+}
+output = replicate(1000, boot_function2())
+quantile(output,probs=c(0.05))
+
+```
+  
+
+
+## 8 Regression analysis
+# 8.1 random forest
+```{r}
+d1=d %>% filter(Reason!="Part-time employment, all reasons")
+# reason=1 means try to find a full-time work in last month
+# reason=0 means not try to find a full-time work in last moth
+d1=d1%>% mutate(reason=case_when(Reason=="  Own illness"~0,
+                               Reason=="  Caring for children"~0,
+                               Reason=="  Other personal or family responsibilities"~0,
+                               Reason=="  Going to school"~0,
+                               Reason=="  Personal preference"~0,
+                               Reason=="  Other voluntary"~0,
+                               Reason=="  Business conditions, did not look for full-time work in last month"~0,
+                               Reason=="  Could not find full-time work, did not look for full-time work in last month"~0,
+                               Reason=="  Business conditions, looked for full-time work in last month"~1,
+                               Reason=="  Could not find full-time work, looked for full-time work in last month"~1))
+library(randomForest)
+rforest.m = randomForest(reason ~ Year+Geography+Immig.+Age.group++Both.sexes+Men+Women,data=d1,ntree=500,importance=TRUE)
+varImpPlot(rforest.m)
+d_randomforest=d1%>%mutate(rforest_pred=predict(rforest.m,new_data=d1))
+mean((d_randomforest$reason-d_randomforest$rforest_pred)^2)
+```
+
+# 8.2 Linear regression
+```{r}
+m2=lm(Both.sexes~Year,data=d_table1)
+summary(m2)
+```
+ (解释pvalue， intercept，slope)
+ for d_table1, 0.9248 of the population can be explained by the linear regression model.
+ 
+
+
