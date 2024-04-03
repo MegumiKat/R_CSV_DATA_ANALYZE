@@ -121,7 +121,9 @@ t.test(d_ratio %>% select(ratio),alternative="less",mu=0.5,conf.level=0.95)
 reject  H0 more women 因为caring for children而选择parttime
 
 ## 7. Bootstrapping
-# 7.1 test parttime 增长率的CI for regression
+
+# 7.1 Bootstrapping Analysis for Slope Coefficient Estimation in Linear Regression Model
+The code below is to perform bootstrapping to estimate the variability of the slope coefficient in a linear regression model where 'Both.sexes' is the response variable and 'Year' is the predictor variable. The code achieves this by repeatedly sampling with replacement from the dataset ('d_table1'), fitting linear models to the sampled data, extracting the slope coefficient from each model, and finally calculating the 2.5th and 97.5th percentiles of the slope coefficient estimates obtained from bootstrapping.
 ```{r}
 # Define a bootstrapping function named 'boot_function'.
 # Within the function:
@@ -142,7 +144,18 @@ output = replicate(1000, boot_function())
 quantile(output, c(0.025,0.975))
 
 ```
-# 7.2 （重现6.2的CI） week6 
+**From the above consequence:**
+
+    ·The 2.5th percentile of the bootstrapped slope coefficients is approximately -73.7383.
+    ·The 97.5th percentile of the bootstrapped slope coefficients is approximately 124.1169.
+  The positive relationship between 'Year' and 'Both.sexes' suggests a potential long-term trend in the variable 'Both.sexes' over the years covered in the dataset. This trend could indicate societal changes, cultural shifts, or policy interventions that have led to an increase in the value of 'Both.sexes' over time.
+  
+  In the meanwhile, the increasing values of 'Both.sexes' may reflect progress towards gender equality or a blurring of traditional gender roles over time. This trend could be indicative of greater acceptance and recognition of diverse gender identities and expressions in society.
+  
+  By the way, this ouput may also contribute to raising public awareness about the evolving nature of gender identities and expressions. It underscores the importance of fostering inclusive environments and promoting acceptance and understanding of diverse gender experiences.
+
+# 7.2 Bootstrapping Analysis for Mean Estimation
+The code below is to conduct bootstrapping to estimate the mean of the 'ratio' variable in the 'd_ratio' dataset. The function 'boot_function2' is defined to repeatedly sample with replacement from the 'ratio' variable, calculate the mean of the sampled data, and return it. The code then performs bootstrapping by calling 'boot_function2' 1000 times and calculates the 5th percentile of the resulting output vector.
 ```{r}
 # Define a bootstrapping function named 'boot_function2'.
 # Within the function:
@@ -162,7 +175,12 @@ output = replicate(1000, boot_function2())
 quantile(output,probs=c(0.05))
 
 ```
+**From the above consequence:**
+
+    The output indicates that the 5th percentile of the bootstrapped means of the 'ratio' variable is approximately 0.045. This suggests that there is a 5% probability that the true mean of the 'ratio' variable in the population is lower than or equal to 0.045, based on the bootstrapped samples.
   
+    Therefore, the conclusion is that the estimated mean of the 'ratio' variable in the dataset 'd_ratio' is likely to be greater than 0.045, with 95% confidence. This information can be valuable for understanding the central tendency of the 'ratio' variable and making inferences about the population mean based on the sampled data.
+
 
 
 ## 8 Regression analysis
@@ -191,7 +209,9 @@ rforest.m = randomForest(reason ~ Year+Geography+Immig.+Age.group++Both.sexes+Me
 varImpPlot(rforest.m)
 # Make predictions using the random forest model on the same data ('d1') and calculate the mean squared error
 d_randomforest=d1%>%mutate(rforest_pred=predict(rforest.m,new_data=d1))
+
 mean((d_randomforest$reason-d_randomforest$rforest_pred)^2)
+
 ```
 
 # 8.2 Linear regression
@@ -201,6 +221,9 @@ m2=lm(Both.sexes~Year,data=d_table1)
 # Display a summary of the linear regression model
 summary(m2)
 ```
+Here are some explanations about the component:
+
+
  (解释pvalue， intercept，slope)
  for d_table1, 0.9248 of the population can be explained by the linear regression model.
  
