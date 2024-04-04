@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ```{r}
 # Read the CSV file located at the specified path into a data frame named 'd'
-d =read.csv ("/Users/yshhhh/Desktop/STAA57.csv") 
+d =read.csv ("/Users/mark/Desktop/course/staa57/R_CSV_DATA_ANALYZE/g0811_05.csv") 
 # Load the 'tidyverse' package, which includes a collection of R packages for data manipulation and visualization
 library(tidyverse)
 # Load the 'ggplot2' package, a popular R package for creating graphics and plots
@@ -127,7 +127,7 @@ popular reasons for finding a part-time in immigrant groups and plan their
 careers and life accordingly, such as finding a part-time to accumulate funds 
 for academic qualification improvement.
 
-# 4.2 Total population of part-time job over Canada
+# 4.2 Total population of part-time job over different geography
 
 ```{r}
 # Create a new data frame 'd_table1' by filtering the data frame 'd' to select 
@@ -143,7 +143,7 @@ d_table1=d %>%
 kable(d_table1)
 ```
 
-# 4.3（test reason=	Caring for children 的比例 ，男女的ratio是否一样（4.3 table）） test ratio=0.5
+# 4.3 The ratio of part-time job men over Canada
 ```{r}
 # Filter the data frame 'd' to select rows where 'Geography' is "Canada"
 d_ratio= d %>% filter(Geography=="Canada") 
@@ -164,43 +164,71 @@ kable(d_ratio)
 
 
 ## 5. Graphs
-# 5.1 Graph of population of par-time job men over years
+# 5.1 Graph of population of par-time job men over years in different geography
 ```{r}
 # Create a ggplot object and add a line plot using the 'geom_line' function.
 # Map the 'Year' variable to the x-axis, 'Men' variable to the y-axis, and 'Geography' variable to the color aesthetic.
 # Use data from the 'd_table1' data frame.
-# Label the y-axis as "population of part-time job men"
+# Label the y-axis as "population of part-time job men in different geography"
 # Set the title of the plot as "Graph of population of par-time job men over years"
 ggplot()+geom_line(aes(x=Year,y=Men,col=Geography),data=d_table1)+
   ylab("population of part-time job men")+
-  ggtitle("Graph of population of par-time job men over years")
+  ggtitle("Graph of population of par-time job men over years in different geography")
 ```
+**From the above graph:**
 
+This graph indicates population of par-time job men over years in different geography. The x-axis represents years which in the interval of 2006 to 2009, while the y-axis represents the population of part-time job men.
 
-# 5.2 Graph of tatio (table 4.2的 呃呃改改这个标题)  over years 
+The red line shows the trend of the population of part time job men in Canada and the green line shows the trend of the total number of part time job men in Ontario. They show that although in some specific years the population of part-time job men decreased, the main trend of the population is increasing year by year.
+
+This pattern shows the trend of part time job men is increasing, which may help to reflect some reasons about the current society:
+  - The role for men between family and job may be changed. The increasing population may reveal that men became more active in family and children-caring instead of focus on works
+  - The workplace or the policy may have changed, which makes men more likely to choose part time job to have more flexible work time and keep balance between family and work.
+
+# 5.2 Graph of ratio of men working part-time due to children-caring over year
 ```{r}
+# Plot a scatter plot using ggplot, with 'Year' on the x-axis and 'ratio' on the y-axis, based on the data in the 'd_ratio' dataframe.
+# Add points to the plot to represent the data points.
+# Add a label to the y-axis indicating that it represents the 'ratio'.
+# Add a linear regression line to the plot using the geom_smooth function with method="lm" (linear model).
+# Add a title to the plot indicating that it represents the graph of the ratio of men working part-time because of children-caring over years.
 ggplot(aes(x=Year,y=ratio),data=d_ratio)+geom_point()+
-  ylab("ratio")+
-  geom_smooth(method="lm")+  #why no line
-  ggtitle("title") #记得改
+  ylab("ratio of men working part-time due to children-caring")+
+  geom_smooth(method="lm")+ 
+  ggtitle("Graph of ratio of men working part-time because of children-caring over year") #记得改
 ```
+**From the above graph:**
 
+This graph indicates the ratio of part-time job men whose doing part time reason is mostly because of children caring. The x-axis represents years which in the interval of 2006 to 2009, while the y-axis represents the ratio of part-time job men in each year.
 
+The points indicate the specific ratio in each year and the line shows the trend of the ratio of part time job men throughout the year. In the graph, we can find that the most ratio points are around the line, besides some edge value, like 2015's, and the line has the positive slope, which means the ratio of men who doing the part time due to care their children is almost increasing over year.
+
+According to the pattern, we can find or guess the trend of ratio increasing may be caused by:
+  - The change of family stucture, which means more men need to take care of family responsibilities.This may be due to many reasons such as more men choosing to take on childcare responsibilities or the increase in the employment rate of women in the family.
+  - The cultural perceptions and values among people may shift, which means men may prefer to strike a balance between career and family life, choosing to work fewer hours to better care for their children.
 
 ## 6. Confidence interval and test of hypothesis
-test reason=caring for children 的比例 ，男女的proportion是否一样（4.3 table）
- The null hypothesis (H0) is that the population mean of the 'ratio' variable is equal to 0.5.
- The alternative hypothesis (H1) is that the population mean of the 'ratio' variable is less than 0.5.
+According to the 4.3 table ("The ratio of part-time job men over Canada")
+  - The null hypothesis (H0) is that the population mean of the 'ratio' variable is equal to 0.5.
+  - The alternative hypothesis (H1) is that the population mean of the 'ratio' variable is less than 0.5.
 ```{r}
 
 # Perform a one-sample t-test on the 'ratio' variable from the 'd_ratio' data frame.
 # Use a confidence level of 95%.
 t.test(d_ratio %>% select(ratio),alternative="less",mu=0.5,conf.level=0.95)
 ```
-reject  H0  which means more women 因为caring for children而选择parttime
+**From the above output:**
+
+The output use the t-test according to the 4.3 table ("The ratio of part-time job men over Canada") to generate the 95 percent CI which is (-Inf, 0.056). After the generating of CI, we set the H0, and H1 to do the test of hypothesis.
+
+  - The null hypothesis (H0) is that the population mean of the 'ratio' variable is equal to 0.5.
+  - The alternative hypothesis (H1) is that the population mean of the 'ratio' variable is less than 0.5.
+
+According to the CI's upper bound is less than 0.5, it rejects H0 which means more women rather than men choose doing part-time job due to caring for children. Thus, with two graph in part 5, the conclusion is that although more and more men were transferring their attention from works to family, the burden of taking care of the family and children still mainly falls on women.
 
 ## 7. Bootstrapping
-# 7.1 test parttime 增长率的CI for regression
+
+# 7.1 Bootstrapped Confidence Interval for Slope Coefficient Estimation in Linear Regression
 ```{r}
 # Define a bootstrapping function named 'boot_function'.
 # Within the function:
@@ -223,16 +251,18 @@ quantile(output, c(0.025,0.975))
 ```
 **From the above consequence:**
 
-    ·The 2.5th percentile of the bootstrapped slope coefficients is approximately -73.7383.
-    ·The 97.5th percentile of the bootstrapped slope coefficients is approximately 124.1169.
-  The positive relationship between 'Year' and 'Both.sexes' suggests a potential long-term trend in the variable 'Both.sexes' over the years covered in the dataset. This trend could indicate societal changes, cultural shifts, or policy interventions that have led to an increase in the value of 'Both.sexes' over time.
+    ·The 2.5th percentile of the bootstrapped slope coefficients is approximately -73.7383 (one of the consequence)
+    ·The 97.5th percentile of the bootstrapped slope coefficients is approximately 124.1169 (one of the consequence)
+The slope of "Both.sexes~Year" has the 95 CI between -73.7383 and 124.1169, which is one of the possible data but the real interval is similar. However, the slope is negative or positive means that we can't ensure whether the numbers is entirely increasing or entirly decreasing. Besides of this, following the tables above, we can conclude the trend is positive. 
+
+  Thus, when the positive relationship between 'Year' and 'Both.sexes' suggests a potential long-term trend in the variable 'Both.sexes' over the years covered in the dataset. This trend could indicate societal changes, cultural shifts, or policy interventions that have led to an increase in the value of 'Both.sexes' over time.
   
   In the meanwhile, the increasing values of 'Both.sexes' may reflect progress towards gender equality or a blurring of traditional gender roles over time. This trend could be indicative of greater acceptance and recognition of diverse gender identities and expressions in society.
   
   By the way, this output may also contribute to raising public awareness about the evolving nature of gender identities and expressions. It underscores the importance of fostering inclusive environments and promoting acceptance and understanding of diverse gender experiences.
   
 
-# 7.2 （重现6.2的CI） week6 
+# 7.2 Reproduce CI for 6
 ```{r}
 # Define a bootstrapping function named 'boot_function2'.
 # Within the function:
@@ -252,11 +282,11 @@ output = replicate(1000, boot_function2())
 quantile(output,probs=c(0.05))
 
 ```
-  **From the above consequence:**
+**From the above consequence:**
 
-    The output indicates that the 5th percentile of the bootstrapped means of the 'ratio' variable is approximately 0.045. This suggests that there is a 5% probability that the true mean of the 'ratio' variable in the population is lower than or equal to 0.045, based on the bootstrapped samples.
+The output indicates that the 5th percentile of the bootstrapped means of the 'ratio' variable is approximately 0.045. This suggests that there is a 5% probability that the true mean of the 'ratio' variable in the population is lower than or equal to 0.045, based on the bootstrapped samples.
   
-    Therefore, the conclusion is that the estimated mean of the 'ratio' variable in the dataset 'd_ratio' is likely to be greater than 0.045, with 95% confidence. This information can be valuable for understanding the central tendency of the 'ratio' variable and making inferences about the population mean based on the sampled data.
+Therefore, the conclusion is that the estimated mean of the 'ratio' variable in the dataset 'd_ratio' is likely to be greater than 0.045, with 95% confidence. This information can be valuable for understanding the central tendency of the 'ratio' variable and making inferences about the population mean based on the sampled data.
 
 
 ## 8 Regression analysis
@@ -283,6 +313,8 @@ library(randomForest)
 # Build a random forest model ('rforest.m') to predict the 'reason' variable based on other variables.
 rforest.m = randomForest(as.factor(reason) ~ Year+Geography+Immig.+Age.group++Both.sexes+Men+Women,data=d1,ntree=500,importance=TRUE)
 # Visualize variable importance using the 'varImpPlot' function
+importance(rforest.m, type=1)
+importance(rforest.m, type=2)
 varImpPlot(rforest.m)
 # Make predictions using the random forest model on the same data ('d1') and calculate the mean squared error
 d_randomforest=d1%>%mutate(rforest_pred=predict(rforest.m,new_data=d1))
@@ -290,6 +322,15 @@ matrix=table(d_randomforest$reason,d_randomforest$rforest_pred)
 matrix
 mean(sum(diag(matrix))/sum(matrix))
 ```
+**From the above consequence:**
+
+The random forest model built using the provided predictors (Year, Geography, Immig., Age.group, Both.sexes, Men, Women) shows promising performance in predicting the reason variable.
+
+The most important predictors for predicting whether the reason involves looking for full-time work in the last month (reason variable) appear to be related to gender (Both.sexes, Men, Women), geography, immigration status (Immig.), and age group.
+
+The model's overall accuracy on the training data is reasonably high (82.4%, approximately), indicating that the model captures meaningful patterns in the data.
+
+However, it's essential to validate the model's performance on unseen data (e.g., using cross-validation or a separate test data set) to ensure its generalization.
 
 # 8.2 Linear regression
 ```{r}
@@ -298,8 +339,64 @@ m2=lm(Both.sexes~Year,data=d_table1)
 # Display a summary of the linear regression model
 summary(m2)
 ```
- (解释pvalue， intercept，slope)
- for d_table1, 0.9248 of the population can be explained by the linear regression model.
- 
-# 9 Summary of Research
+**From the above consequence:**
 
+  - p-value: both the p-value for the intercept and the p-value for the coefficient of 'Year' are greater than 0.05 (0.604 and 0.588, respectively). This suggests that there is not enough evidence to conclude that the intercept or the slope of the regression line significantly differs from zero. Geometrically, this implies that the regression line may not provide a meaningful representation of the relationship between 'Both.sexes' and 'Year'.
+  
+  - Intercept: it's important to interpret the intercept cautiously. Since the independent variable is Year, and it's highly unlikely that the variable being studied (Both.sexes) can be zero in a meaningful sense, interpreting the intercept directly might not be very insightful.
+
+  - slope: The coefficient for the Year variable is 27.28. This means that for every one-unit increase in the Year variable, the value of Both.sexes is expected to increase by approximately 27.28 units. 
+
+# 9. Cross validation
+```{r}
+# Create a new dataset `d_cross` by adding a new column `group_ind`, 
+# where each observation is randomly assigned to either "train" or "test" group
+d_cross=d1 %>% mutate(group_ind = sample(c("train","test"),
+                                    size=nrow(d1),
+                                    prob = c(0.6,0.4), 
+                                    replace = T))
+# Fit a random forest model (`randomForest`) to predict the `reason` variable,
+# using the specified independent variables, on the observations from the "train" group
+rforest.cross = randomForest(as.factor(reason) ~
+                           Year+Geography+Immig.+Age.group++Both.sexes+Men+Women,
+                         data=d_cross %>% filter(group_ind=="train"),
+                         ntree=500, # Number of trees in the random forest
+                         importance=TRUE) # Compute variable importance measures
+# Predict the values of the `reason` variable using the fitted random forest model
+reason.hat=predict(rforest.cross)
+# Create a confusion matrix (`matrix_train`) to evaluate the performance of the model
+# on the training data by comparing the actual values of `reason` with the predicted values
+matrix_train=table(d_cross$reason[d_cross$group_ind=="train"],reason.hat)
+# Display the confusion matrix
+matrix_train
+# Calculate the overall accuracy of the model on the training data
+mean(sum(diag(matrix_train))/sum(matrix_train))
+```
+**From the above output:**
+
+This chart provides the confusion matrix for the predictions made on the training data. Each row represents the actual reason values, while each column represents the predicted reason.hat values. The numbers in the cells of the matrix represent the counts of observations falling into each category.
+
+Besides:
+  - The diagonal elements of the confusion matrix represent the correctly classified observations.
+  - The off-diagonal elements represent the misclassified observations.
+  - The overall accuracy of the model on the training data is approximately 81.48%.
+  
+# for test data
+```{r}
+# Predict the values of the `reason` variable using the fitted random forest model
+# on the observations from the "test" group
+reason.hat=predict(rforest.cross,newdata=d_cross %>% filter(group_ind=="test"))
+# Create a confusion matrix (`matrix_test`) to evaluate the performance of the model
+# on the test data by comparing the actual values of `reason` with the predicted values
+matrix_test=table(d_cross$reason[d_cross$group_ind=="test"],reason.hat)
+# Display the confusion matrix for the test data
+matrix_test
+# Calculate the overall accuracy of the model on the test data
+mean(sum(diag(matrix_test))/sum(matrix_test))
+
+```
+**From the above output:**
+
+  - The confusion matrix shows the counts of correctly and incorrectly classified observations on the test data.
+  - The diagonal elements represent the correctly classified observations, while the off-diagonal elements represent the misclassified observations.
+  - The overall accuracy of the model on the test data is approximately 81.07%.
