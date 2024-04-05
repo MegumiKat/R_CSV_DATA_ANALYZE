@@ -1,5 +1,5 @@
 ---
-title: "STAA57 Assignment_newest"
+title: "STAA57 Assignment"
 author: "Group"
 date: "2024-03-28"
 output:
@@ -30,41 +30,45 @@ library(rpart)
 ```{r}
 # Display the column names of the data frame 'd'
 names(d)
-
-glimpse(d)
 ```
-(describe variables)
 [1]: The year immigrants immigrated to the Geometry area
+
 [2]: The geographic area of the research, in which Ontario is
      included in Canada
+     
 [3]: The type of immigration.
+
 [4]: Reason for working the part-time job
+
 [5]: The age group of the immigrants working the part-time job
+
 [6]: The amount of of immigrants of both genders working the part-time job
+
 [7]: The amount of male immigrants working the part-time job
+
 [8]: The amount of female immigrants working the part-time job
 
 ## 2.The Background of the Data
-https://data.ontario.ca/dataset/reason-for-part-time-work-by-immigration-status
-
-The reasons for part-time-work by immigration- tatus data for 2020 was collected 
+The reasons for part-time-work by immigration- status data from 2006 to 2019 was collected 
 by Statistics Canada, specifically by the Labour Force Survey Special 
-Tabulations. The data collected includes information on reason for part-time 
+Tabulations. The data collected includes information on reasons for part-time 
 work by immigration status, such as caring for children, going to school, 
 and could not find full-time work, looked for full-time work in last month, 
 and so on.This data can be reproduced and distributed on an "as is" basis with 
 the permission of Statistics Canada (Statistics Canada Open Licence Agreement).
 
+可以删掉或者放到结尾：
+#
 The dataset can be used for analysis and insights into the part-time job 
 employment patterns and trends of immigrants looking for part-time jobs in 
 Canada from 2006 to2016. 
-Beginning January 1997, all respondents who usually worked less 
+Beginning in January 1997, all respondents who usually worked less 
 than 30 hours per week at their main or only job (part-time workers) are asked 
 if they want to work more or less than 30 hours at a (single) job or business. 
 Depending on the response, the main reason for working part-time is collected.
 For those who respond that they want to work part-time, the main reason for not 
 wanting to work full-time is collected. Responses include: own illness, personal 
-or family responsibilities, going to school, personal preference, or other. For 
+or family responsibilities, going to school, personal preference or other. For 
 those who respond that they want to work full-time, the main reason for working 
 part-time is collected. Responses include: own illness, personal or family 
 responsibilities, going to school, business conditions, could not find work 
@@ -74,17 +78,18 @@ with 30 or more hours during the past four weeks. The involuntary part-time rate
 is calculated by dividing the number of persons whose response was business 
 conditions or could not find work with 30 or more hours by the total number of
 persons working part-time at their main or only job.
+#
 
 Overall, the reason-for-part-time-work-by-immigration-status dataset is a 
 valuable resource for assessing the effectiveness of employment policies across
-immigration status, and inform labor market planning and policy decisions by 
+immigration status, and informing labor market planning and policy decisions by 
 immigration status. 
 
 
 ## 3.What is the over all research question？
 As researchers, our overall research question is to investigate the part-time
 job employment patterns and trends of immigrants looking for part-time jobs in 
-Canada from 2006 to2016. We aim to analyze various variables, such as age group,
+Canada from 2006 to 2019. We aim to analyze various variables, such as age group,
 immigration status, gender(sex), reasons, year and geography, to gain insights 
 into the connection between immigration status and part-time work, 
 and to identify any patterns or trends that may emerge from the data. 
@@ -98,7 +103,6 @@ Canada and Ontario
 ## 4. Tables
 # 4.1  The Top 5 Most Popular Reasons for immigration
 ```{r}
-
 d_top5=d %>% 
   filter(Reason!="Part-time employment, all reasons" &Immig.=="Total" 
          &Age.group=="15+" &Geography=="Canada") %>% 
@@ -106,8 +110,7 @@ d_top5=d %>%
           mutate(total_popu_over_years=sum(Both.sexes))
 d_top5=d_top5 %>% filter(Year=="2016") %>% 
   select(Reason,total_popu_over_years) %>% arrange(desc(total_popu_over_years))
-# Display the data in 'd_top5' as a nicely formatted table using the 'kable' function
-kable(d_top5[1:5,])
+head(d_top5,n=5)
 
 ```
 This table shows the top 5 most popular reasons for immigrants to work 
@@ -127,7 +130,7 @@ popular reasons for finding a part-time in immigrant groups and plan their
 careers and life accordingly, such as finding a part-time to accumulate funds 
 for academic qualification improvement.
 
-# 4.2 Total population of part-time job over different geography
+# 4.2 Total population of part-time job over Canada
 
 ```{r}
 # Create a new data frame 'd_table1' by filtering the data frame 'd' to select 
@@ -135,15 +138,41 @@ for academic qualification improvement.
 # - Reason is "Part-time employment, all reasons"
 # - Immig. is "Total"
 # - Age.group is "15+"
-# Then, select only the columns 'Year', 'Geography', 'Both.sexes', 'Men', and 
-#'Women' from the filtered data frame.
+# Then, select only the columns 'Year', 'Geography', 'Both.sexes', 'Men', and 'Women' from the filtered data frame.
 # Arrange the resulting data frame by the 'Geography' column.
 d_table1=d %>%
   filter(Reason=="Part-time employment, all reasons" &Immig.=="Total" &Age.group=="15+") %>% select(Year,Geography,Both.sexes,Men,Women) %>% arrange(Geography)
 kable(d_table1)
 ```
+This table shows the The total number of part-time jobs taken by immigrants of 
+each gender in Ontario and Canada as a whole in each yearin the given dataset.
+It lists the names of the stations under the column "Year" and "Geography", and 
+the corresponding number of population over years from 2006 
+to 2016 under the column "Both.sexes.","Men", and "Women".
 
-# 4.3 The ratio of part-time job men over Canada
+In the table,there is a noticeable increase in part-time employment figures 
+over the years, indicating a rising trend in immigrants seeking part-time work
+opportunities during this period.
+
+For Region difference, Ontario consistently exhibits lower part-time employment 
+figures compared to the national average, suggesting potential differences 
+in part-time employment opportunities or preferences among immigrants across 
+different regions.
+
+Overall, while there is an overall upward trend, there are variations in
+part-time employment figures from year to year, with fluctuations observed 
+across different periods. For example, there is a slight decline in Canada's 
+part-time employment figures in 2015, followed by an increase in subsequent 
+years, while Ontario generally follows a similar pattern with minor deviations.
+This data highlights the importance of policymakers and stakeholders in 
+anticipating and addressing the changing needs and preferences of immigrant 
+populations. It provides valuable insights for planning targeted support 
+services or employment opportunities tailored to part-time workers. 
+Consequently, this analysis serves as a foundation for understanding the 
+dynamics of immigrant part-time employment in Canada and Ontario, aiding in 
+informed decision-making and strategic planning for the future.
+
+# 4.3 The proportion of men and women who choose to work part-time because of "Caring for children"
 ```{r}
 # Filter the data frame 'd' to select rows where 'Geography' is "Canada"
 d_ratio= d %>% filter(Geography=="Canada") 
@@ -152,16 +181,34 @@ d_ratio= d %>% filter(Geography=="Canada")
 # - 'Reason' is "Caring for children"
 # - 'Age.group' is "15+"
 # - 'Immig.' is "Total"
-# Then, calculate the ratio of 'Men' to 'Both.sexes' and create a new column named 'ratio'.
-# Finally, select the 'Year' and 'ratio' columns.
+# Then, calculate the ratio of 'Men' to 'Both.sexes' and create a new column 
+# named 'Ratio_men'，same step for Ratio_women.
+# Finally, select the 'Year' and 'Ratio_men','Ratio_women columns.
 d_ratio=d_ratio %>%
   filter(Reason=="  Caring for children" & Age.group=="15+" & Immig.=="Total" ) %>% 
-  mutate(ratio=Men/Both.sexes) %>% select(Year,ratio) 
+  mutate( Ratio_men=Men/Both.sexes, Ratio_women=Women/Both.sexes) %>% select(Year,Ratio_men, Ratio_women) 
 
 # Display the data in 'd_ratio' as a nicely formatted table using the 'kable' function
 kable(d_ratio)
 ```
 
+This table shows the proportion of men and women working part-time because of 
+"Caring for children" in a given year.Some trends can be observed from the data:
+
+The proportion of women is generally higher than the proportion of men 
+throughout the time frame. This suggests that among men and women, women
+are more likely to find a part-time job to care for children. The ratio of 
+males to females fluctuated between the years. For example, between 2006 and 
+2010, the proportion of men remained relatively stable, while the proportion 
+of women increased slightly. However, after 2010, the proportion of men began 
+to increase and the proportion of women began to decrease. 
+This trend intensified between 2013 and 2019, with the proportion of men rising 
+significantly and the proportion of women falling significantly. The proportion 
+of men increased from the initial 0.0389990 to 0.0741538 (an increase of 
+0.702539). This shows that in this specific field, men's participation is 
+gradually increasing and they are increasingly willing to put in more effort 
+in childcare. The participation of women gradually decreased, from the initial 
+0.9613260 to 0.9258462 (a decrease of 0.0354798).
 
 ## 5. Graphs
 # 5.1 Graph of population of par-time job men over years in different geography
@@ -177,13 +224,13 @@ ggplot()+geom_line(aes(x=Year,y=Men,col=Geography),data=d_table1)+
 ```
 **From the above graph:**
 
-This graph indicates population of par-time job men over years in different geography. The x-axis represents years which in the interval of 2006 to 2009, while the y-axis represents the population of part-time job men.
+This graph indicates population of par-time job men over years in different geography. The x-axis represents years which in the interval of 2006 to 2019, while the y-axis represents the population of part-time job men.
 
 The red line shows the trend of the population of part time job men in Canada and the green line shows the trend of the total number of part time job men in Ontario. They show that although in some specific years the population of part-time job men decreased, the main trend of the population is increasing year by year.
 
 This pattern shows the trend of part time job men is increasing, which may help to reflect some reasons about the current society:
   - The role for men between family and job may be changed. The increasing population may reveal that men became more active in family and children-caring instead of focus on works
-  - The workplace or the policy may have changed, which makes men more likely to choose part time job to have more flexible work time and keep balance between family and work.
+  - The workplace or the policy may have changed, which makes men more likely to choose part-time jobs to have more flexible work time and keep the balance between family and work.
 
 # 5.2 Graph of ratio of men working part-time due to children-caring over year
 ```{r}
@@ -192,102 +239,68 @@ This pattern shows the trend of part time job men is increasing, which may help 
 # Add a label to the y-axis indicating that it represents the 'ratio'.
 # Add a linear regression line to the plot using the geom_smooth function with method="lm" (linear model).
 # Add a title to the plot indicating that it represents the graph of the ratio of men working part-time because of children-caring over years.
-ggplot(aes(x=Year,y=ratio),data=d_ratio)+geom_point()+
+ggplot(aes(x=Year,y=Ratio_men),data=d_ratio)+geom_point()+
   ylab("ratio of men working part-time due to children-caring")+
   geom_smooth(method="lm")+ 
-  ggtitle("Graph of ratio of men working part-time because of children-caring over year") #记得改
+  ggtitle("Graph of ratio of men working part-time because of children-caring over year") 
 ```
 **From the above graph:**
 
-This graph indicates the ratio of part-time job men whose doing part time reason is mostly because of children caring. The x-axis represents years which in the interval of 2006 to 2009, while the y-axis represents the ratio of part-time job men in each year.
+This graph indicates the ratio of part-time job men whose doing part time reason is mostly because of children caring. The x-axis represents years which from 2006 to 2019, while the y-axis represents the ratio of part-time job men in each year.
 
-The points indicate the specific ratio in each year and the line shows the trend of the ratio of part time job men throughout the year. In the graph, we can find that the most ratio points are around the line, besides some edge value, like 2015's, and the line has the positive slope, which means the ratio of men who doing the part time due to care their children is almost increasing over year.
+The points indicate the specific ratio in each year and the line shows the trend of the ratio of part-time job men throughout the year. In the graph, we can find that the most ratio points are around the line, besides some edge values, like 2015's, and the line has a positive slope, which means the ratio of men who do the part-time due to caring for their children is almost increasing over year.
 
 According to the pattern, we can find or guess the trend of ratio increasing may be caused by:
-  - The change of family stucture, which means more men need to take care of family responsibilities.This may be due to many reasons such as more men choosing to take on childcare responsibilities or the increase in the employment rate of women in the family.
+  - The change in family structure, which means more men need to take care of family responsibilities. This may be due to many reasons such as more men choosing to take on childcare responsibilities or the increase in the employment rate of women in the family.
   - The cultural perceptions and values among people may shift, which means men may prefer to strike a balance between career and family life, choosing to work fewer hours to better care for their children.
 
 ## 6. Confidence interval and test of hypothesis
-According to the 4.3 table ("The ratio of part-time job men over Canada")
-  - The null hypothesis (H0) is that the population mean of the 'ratio' variable is equal to 0.5.
-  - The alternative hypothesis (H1) is that the population mean of the 'ratio' variable is less than 0.5.
+According to the 4.3 table ("The proportion of men and women who choose to work part-time because of "Caring for children")
+  - H0: The average percentage of men who choose to work part-time because of childcare(μm) is equal to 0.5. i.e.,μm=μw
+  - H1: The average percentage of men who choose to work part-time because of childcare(μm) is less than 0.5. i.e.μm<μw
+  μw is The average percentage of women who choose to work part-time because of childcare
 ```{r}
 
-# Perform a one-sample t-test on the 'ratio' variable from the 'd_ratio' data frame.
+# Perform a one-sample t-test on the 'Ratio_men' variable from the 'd_ratio' data frame.
 # Use a confidence level of 95%.
-t.test(d_ratio %>% select(ratio),alternative="less",mu=0.5,conf.level=0.95)
+t.test(d_ratio %>% select(Ratio_men),alternative="less",mu=0.5,conf.level=0.95)
 ```
 **From the above output:**
+The One Sample t-test shows a significant difference between the average percentage of men and women who choose to work part-time because of childcare. The p-value (2.2e-16) is less than the significance level of 0.05, indicating strong evidence against the null hypothesis of no difference. The confidence interval (-Inf, 0.05610955) also does not include 0.5, further supporting the conclusion that there is a significant difference between the average percentage. Therefore, we can conclude that there is a significant difference in the average percentage of men and women who choose to work part-time because of childcare. More women(percentage is 1-0.05021001=0.9497999) rather than men(percentage is 0.05021001) choose doing part-time job due to caring for children. Thus, with two graph in part 5, the conclusion is that although more and more men were transferring their attention from works to family, the burden of taking care of the family and children still mainly falls on women.
 
-The output use the t-test according to the 4.3 table ("The ratio of part-time job men over Canada") to generate the 95 percent CI which is (-Inf, 0.056). After the generating of CI, we set the H0, and H1 to do the test of hypothesis.
-
-  - The null hypothesis (H0) is that the population mean of the 'ratio' variable is equal to 0.5.
-  - The alternative hypothesis (H1) is that the population mean of the 'ratio' variable is less than 0.5.
-
-According to the CI's upper bound is less than 0.5, it rejects H0 which means more women rather than men choose doing part-time job due to caring for children. Thus, with two graph in part 5, the conclusion is that although more and more men were transferring their attention from works to family, the burden of taking care of the family and children still mainly falls on women.
-
-## 7. Bootstrapping
-
-# 7.1 Bootstrapped Confidence Interval for Slope Coefficient Estimation in Linear Regression
+## 7. Calculate p-value of the Hypothesis in part 6 using Bootstrapping
+According to the 4.3 table ("The proportion of men and women who choose to work part-time because of "Caring for children")
+  - H0: The average percentage of men who choose to work part-time because of childcare(μm) is equal to 0.5. i.e.,μm=μw
+  - H1: The average percentage of men who choose to work part-time because of childcare(μm) is less than 0.5. i.e.μm<μw
+  μw is The average percentage of women who choose to work part-time because of childcare
 ```{r}
-# Define a bootstrapping function named 'boot_function'.
-# Within the function:
-# - Sample with replacement from the 'd_table1' data frame and store it in 'boot.d'.
-# - Fit a linear model ('lm') with 'Both.sexes' as the response variable and 'Year' as the predictor variable using the sampled data.
-# - Extract the slope coefficient ('s') from the fitted model.
-# - Return the slope coefficient.
-boot_function=function(){
-  boot.d = d_table1 %>% sample_n(nrow(d_table1), replace=T)
-  m2 = lm(Both.sexes~Year, data=boot.d)
-  s = coef(m2)[2]
-  return(s) 
-}
-# Perform bootstrapping by calling 'boot_function' 1000 times and store the output in 'output'.
-output = replicate(1000, boot_function()) 
+mu_H0=0.5 # null Hypothesis: mean=0.5
+ratio_men=d_ratio %>% select(Ratio_men)
+obs_mean=mean(ratio_men[,1]) # mean of Ratio_men
 
-# Calculate the 2.5th and 97.5th percentiles of the 'output' vector.
-quantile(output, c(0.025,0.975))
+new_x=ratio_men-obs_mean+mu_H0
 
-```
-**From the above consequence:**
-
-    ·The 2.5th percentile of the bootstrapped slope coefficients is approximately -73.7383 (one of the consequence)
-    ·The 97.5th percentile of the bootstrapped slope coefficients is approximately 124.1169 (one of the consequence)
-The slope of "Both.sexes~Year" has the 95 CI between -73.7383 and 124.1169, which is one of the possible data but the real interval is similar. However, the slope is negative or positive means that we can't ensure whether the numbers is entirely increasing or entirly decreasing. Besides of this, following the tables above, we can conclude the trend is positive. 
-
-  Thus, when the positive relationship between 'Year' and 'Both.sexes' suggests a potential long-term trend in the variable 'Both.sexes' over the years covered in the dataset. This trend could indicate societal changes, cultural shifts, or policy interventions that have led to an increase in the value of 'Both.sexes' over time.
-  
-  In the meanwhile, the increasing values of 'Both.sexes' may reflect progress towards gender equality or a blurring of traditional gender roles over time. This trend could be indicative of greater acceptance and recognition of diverse gender identities and expressions in society.
-  
-  By the way, this output may also contribute to raising public awareness about the evolving nature of gender identities and expressions. It underscores the importance of fostering inclusive environments and promoting acceptance and understanding of diverse gender experiences.
-  
-
-# 7.2 Reproduce CI for 6
-```{r}
-# Define a bootstrapping function named 'boot_function2'.
-# Within the function:
-# - Select the 'ratio' variable from the 'd_ratio' data frame and store it in 'obs.sample'.
-# - Sample with replacement from 'obs.sample' and store it in 'boot.d'.
-# - Calculate the mean of the sampled data and return it.
 boot_function2=function(){
-  obs.sample=d_ratio %>% select(ratio)
-  boot.d = sample_n(obs.sample,size=nrow(d_ratio), replace=T)
+  obs.sample=d_ratio %>% select(Ratio_men)
+  boot.d = sample_n(new_x,size=nrow(d_ratio), replace=T)
   return(mean(boot.d[,1])) 
 }
 
 # Perform bootstrapping by calling 'boot_function2' 1000 times and store the output in 'output'.
-output = replicate(1000, boot_function2())
+set.seed(1)
+boot_new_x_bar = replicate(1000, boot_function2())
 
-# Calculate the 5th percentile of the 'output' vector.
-quantile(output,probs=c(0.05))
+mean(boot_new_x_bar<obs_mean)
 
 ```
-**From the above consequence:**
 
-The output indicates that the 5th percentile of the bootstrapped means of the 'ratio' variable is approximately 0.045. This suggests that there is a 5% probability that the true mean of the 'ratio' variable in the population is lower than or equal to 0.045, based on the bootstrapped samples.
-  
-Therefore, the conclusion is that the estimated mean of the 'ratio' variable in the dataset 'd_ratio' is likely to be greater than 0.045, with 95% confidence. This information can be valuable for understanding the central tendency of the 'ratio' variable and making inferences about the population mean based on the sampled data.
+**From the above output:**
 
+This part performs a bootstrap hypothesis test to assess whether the average percentage of men who choose to work part-time because of childcare is less than 0.5. 
+
+The output is 0, indicating that none of the bootstrap samples had a mean less than the observed mean. Therefore, the p-value is 0, suggesting strong evidence against the null hypothesis. This implies that the average percentage of men who choose to work part-time because of childcare is significantly less than 0.5, supporting the alternative hypothesis that μm < 0.5.
+
+According the output, it revealed that although the trend of ratio of men who choose to work part-time because of childcare is increasing, the amount still small. We can conclude that men’s attention is turning to their families, but the main responsibility for taking care of children and families still lies with women.
 
 ## 8 Regression analysis
 # 8.1 random forest
@@ -313,8 +326,6 @@ library(randomForest)
 # Build a random forest model ('rforest.m') to predict the 'reason' variable based on other variables.
 rforest.m = randomForest(as.factor(reason) ~ Year+Geography+Immig.+Age.group++Both.sexes+Men+Women,data=d1,ntree=500,importance=TRUE)
 # Visualize variable importance using the 'varImpPlot' function
-importance(rforest.m, type=1)
-importance(rforest.m, type=2)
 varImpPlot(rforest.m)
 # Make predictions using the random forest model on the same data ('d1') and calculate the mean squared error
 d_randomforest=d1%>%mutate(rforest_pred=predict(rforest.m,new_data=d1))
@@ -400,3 +411,4 @@ mean(sum(diag(matrix_test))/sum(matrix_test))
   - The confusion matrix shows the counts of correctly and incorrectly classified observations on the test data.
   - The diagonal elements represent the correctly classified observations, while the off-diagonal elements represent the misclassified observations.
   - The overall accuracy of the model on the test data is approximately 81.07%.
+```
