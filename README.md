@@ -1,6 +1,8 @@
 # R_CSV_DATA_ANALYZE
 STAA57 PROJECT
 
+**Mainly around the part-time job people in recent year**
+
 As a group(or individual), find a dataset(or multiple datasets) from https://data.ontario.ca/ and using the dataset(s) demonstrate the use of the tools that you have learned in this course. Your report/work must include
 
   - Description of the variables and the data
